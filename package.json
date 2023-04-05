@@ -1,0 +1,44 @@
+{
+  "name": "@mashvp/nextjs-strapi-gateway",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Next.js helpers for fetching data from the Strapi REST API",
+  "repository": "https://github.com/mashvp/nextjs-strapi-gateway",
+  "author": "Mashvp",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/nextjs-strapi-gateway.umd.cjs",
+  "module": "./dist/nextjs-strapi-gateway.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/nextjs-strapi-gateway.js",
+      "require": "./dist/nextjs-strapi-gateway.umd.cjs"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/qs": "^6.9.7",
+    "@vitest/coverage-c8": "^0.29.8",
+    "@vitest/ui": "^0.29.8",
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0",
+    "vite-plugin-dts": "^2.2.0",
+    "vitest": "^0.29.8"
+  },
+  "dependencies": {
+    "qs": "^6.11.1"
+  }
+}
