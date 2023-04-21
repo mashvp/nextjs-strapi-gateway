@@ -42,11 +42,12 @@ export const fetchAPI = async <T>(
   options: RequestInit = {}
 ) => {
   const mergedOptions = {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
+      ...options?.headers,
     },
-    ...options,
   };
 
   const queryString = qs.stringify(urlParamsObject);
