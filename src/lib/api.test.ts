@@ -67,6 +67,12 @@ describe('fetchNoop', () => {
   test('returns an empty object', async () => {
     expect(await fetchNoop()).toStrictEqual({});
   });
+
+  test('returns the passed object', async () => {
+    const value = { foo: 'bar' };
+
+    expect(await fetchNoop(value)).toStrictEqual(value);
+  });
 });
 
 describe('wrappedFetchAPI', () => {

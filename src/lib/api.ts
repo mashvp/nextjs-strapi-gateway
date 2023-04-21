@@ -90,8 +90,8 @@ export const fetchAPI = async <T>(
  *
  * @returns the dummy API response as JSON
  */
-export const fetchNoop = async <T>() => {
-  return {} as T;
+export const fetchNoop = async <T>(value: T = {} as T) => {
+  return value;
 };
 
 /**

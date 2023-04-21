@@ -23,6 +23,7 @@ describe('getStrapiMediaURL', () => {
           hash: 'fake123',
           url: '/fake.png',
           ext: 'png',
+          mime: 'image/png',
           width: 800,
           height: 600,
           formats: {},
@@ -42,6 +43,7 @@ describe('getStrapiMediaURL', () => {
           hash: 'fake123',
           url: 'http://example.com/fake.png',
           ext: 'png',
+          mime: 'image/png',
           width: 800,
           height: 600,
           formats: {},
@@ -58,6 +60,7 @@ describe('getStrapiMediaURL', () => {
       hash: 'fake123',
       url: '/fake.png',
       ext: 'png',
+      mime: 'image/png',
       width: 800,
       height: 600,
     };
@@ -71,6 +74,7 @@ describe('getStrapiMediaURL', () => {
       hash: 'fake123',
       url: 'http://example.com/fake.png',
       ext: 'png',
+      mime: 'image/png',
       width: 800,
       height: 600,
     };

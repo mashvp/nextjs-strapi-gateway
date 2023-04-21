@@ -5,6 +5,7 @@ export interface ImageDataFormat {
   hash: string;
   url: string;
   ext: string;
+  mime: string;
   width: number;
   height: number;
 }
