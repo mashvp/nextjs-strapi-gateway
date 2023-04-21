@@ -55,11 +55,17 @@ describe('fetchAPI', () => {
       /401 unauthorized/i
     );
   });
+
+  test('fails on invalid response format (not json)', async () => {
+    await expect(() => fetchAPI('/ping/bare')).rejects.toThrowError(
+      SyntaxError
+    );
+  });
 });
 
 describe('fetchNoop', () => {
   test('returns an empty object', async () => {
-    expect(await fetchNoop()).toMatchObject({});
+    expect(await fetchNoop()).toStrictEqual({});
   });
 });
 

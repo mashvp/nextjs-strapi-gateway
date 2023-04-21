@@ -2,17 +2,17 @@ import qs from 'qs';
 
 import type { ObjectWithProp } from './types';
 
-export type APICall = <T>(
+export type APICall<T> = (
   path: string,
   urlParamsObject?: Record<string, unknown>,
   options?: RequestInit
 ) => Promise<T>;
 
-export type APICallFunc<T> = () => Promise<T>;
+export type APICallFunc<T> = () => ReturnType<APICall<T>>;
 
 export type WrappedAPICallFunc<V, K extends string> = (
   wrapperKey: K,
-  args: Parameters<APICall>
+  args: Parameters<APICall<V>>
 ) => Promise<ObjectWithProp<K, V>>;
 
 /**
@@ -36,7 +36,7 @@ export const getStrapiURL = (path = '') =>
  *
  * @returns the API response as JSON
  */
-export const fetchAPI: APICall = async <T>(
+export const fetchAPI = async <T>(
   path: string,
   urlParamsObject: Record<string, unknown> = {},
   options: RequestInit = {}
@@ -72,8 +72,16 @@ export const fetchAPI: APICall = async <T>(
     throw new Error(message);
   }
 
-  // TODO: Check if json() succeeds
-  return (await response.json()) as T;
+  try {
+    const json = await response.json();
+
+    return json as T;
+  } catch (error) {
+    const message = ['Strapi API JSON error:', error, '@', path].join(' ');
+
+    console.error(message);
+    throw error;
+  }
 };
 
 /**
@@ -95,7 +103,7 @@ export const fetchNoop = async <T>() => {
  */
 export const wrappedFetchAPI = async <K extends string, V>(
   wrapperKey: K,
-  args: Parameters<APICall>
+  args: Parameters<APICall<V>>
 ): Promise<ObjectWithProp<K, V>> => {
   const response = await fetchAPI<V>(...args);
 

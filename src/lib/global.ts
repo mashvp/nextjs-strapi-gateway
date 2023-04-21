@@ -1,6 +1,15 @@
 import type { APICallFunc } from './api';
 import type { Wrapped } from './types';
 
+/**
+ * Gets the type of the data returned by a wrapped global API call.
+ *
+ * Usage:
+ *
+ * ```ts
+ * type MyReturnType = GlobalAPICallReturnType<typeof myWrappedFetchFunction>;
+ * ```
+ */
 export type GlobalAPICallReturnType<T extends APICallFunc<unknown>> = Partial<
   Awaited<ReturnType<T>>
 >;
@@ -15,7 +24,7 @@ export type GlobalAPICallReturnType<T extends APICallFunc<unknown>> = Partial<
  * kept on top level, while globals will be accessible inside the `global` key.
  *
  * Note: This function is generic, you need to pass in the types of the global
- * calls. The correct type should be the intersection of the return value
+ * calls. The correct type should be the union of the return value
  * of all global calls, which can be obtained using
  * the `GlobalAPICallReturnType` helper.
  *
