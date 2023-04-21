@@ -1,6 +1,6 @@
-<h1 style="text-align:center">
-  Next.js <span style="color:#4945ff">⇌</span> Strapi<br>
-  <span style="font-size:0.75em">Gateway</span>
+<h1 align="center">
+  Next.js ⇌ Strapi<br>
+  Gateway
 </h1>
 
 ## Installation
