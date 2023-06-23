@@ -1,5 +1,11 @@
 import { test, expect, describe, vi, beforeEach } from 'vitest';
-import { fetchAPI, fetchNoop, getStrapiURL, wrappedFetchAPI } from './api';
+import {
+  fetchAPI,
+  fetchNoop,
+  getStrapiURL,
+  retry,
+  wrappedFetchAPI,
+} from './api';
 
 beforeEach(async () => {
   vi.stubGlobal('process', {
@@ -91,5 +97,11 @@ describe('wrappedFetchAPI', () => {
     await expect(() =>
       wrappedFetchAPI('invalid', ['/invalid'])
     ).rejects.toThrowError(/404 not found/i);
+  });
+});
+
+describe('retry', () => {
+  test('tries three times then gives up', async () => {
+    await expect(retry(() => fetchAPI('/dummy'), 3, 100)).throws;
   });
 });

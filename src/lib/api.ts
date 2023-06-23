@@ -1,6 +1,7 @@
 import qs from 'qs';
 
 import type { ObjectWithProp } from './types';
+import { wait } from './utils';
 
 export type APICall<T> = (
   path: string,
@@ -109,4 +110,40 @@ export const wrappedFetchAPI = async <K extends string, V>(
   const response = await fetchAPI<V>(...args);
 
   return { [wrapperKey]: response } as ObjectWithProp<K, V>;
+};
+
+/**
+ * Wraps a fetch call and retries it up to `maxTries` times if it fails.
+ *
+ * @param fetchCall the API call function
+ * @param maxTries the maximum number of tries to run
+ * @param waitDelay the delay in milliseconds to wait before each tries
+ *
+ * @returns the API response data or null
+ */
+export const retry = async <T>(
+  fetchCall: APICallFunc<T>,
+  maxTries: number,
+  waitDelay: number = 0
+) => {
+  for (let round = 0; round < maxTries; round += 1) {
+    try {
+      return await fetchCall();
+    } catch (error) {
+      console.warn(
+        [
+          `(Retry ${round + 1}/${maxTries}) Strapi API query error:`,
+          (error as Error).message,
+        ].join(' ')
+      );
+
+      if (round >= maxTries - 1) {
+        throw error;
+      } else {
+        await wait(waitDelay);
+      }
+    }
+  }
+
+  return null;
 };

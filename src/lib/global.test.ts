@@ -17,16 +17,7 @@ beforeEach(async () => {
 describe('createGlobalDataWrapper', () => {
   test('fetches a basic api endpoint along with global data', async () => {
     const fetchMainNavigation = async () =>
-      wrappedFetchAPI('navigation', [
-        '/menus',
-        {
-          populate: '*',
-          nested: '',
-          filters: {
-            slug: 'main-navigation',
-          },
-        },
-      ]);
+      wrappedFetchAPI('navigation', ['/menu-main', { populate: 'deep' }]);
 
     const withGlobalData = createGlobalDataWrapper(fetchMainNavigation);
 
@@ -37,12 +28,10 @@ describe('createGlobalDataWrapper', () => {
       },
       global: {
         navigation: {
-          data: [
-            {
-              id: expect.any(Number),
-              attributes: expect.any(Object),
-            },
-          ],
+          data: {
+            id: expect.any(Number),
+            attributes: expect.any(Object),
+          },
         },
       },
     });
