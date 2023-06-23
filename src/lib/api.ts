@@ -126,10 +126,14 @@ export const retry = async <T>(
   maxTries: number,
   waitDelay: number = 0
 ) => {
+  let lastError;
+
   for (let round = 0; round < maxTries; round += 1) {
     try {
       return await fetchCall();
     } catch (error) {
+      lastError = error;
+
       console.warn(
         [
           `(Retry ${round + 1}/${maxTries}) Strapi API query error:`,
@@ -137,13 +141,11 @@ export const retry = async <T>(
         ].join(' ')
       );
 
-      if (round >= maxTries - 1) {
-        throw error;
-      } else {
+      if (round < maxTries - 1) {
         await wait(waitDelay);
       }
     }
   }
 
-  return null;
+  throw lastError;
 };
