@@ -6,6 +6,7 @@ import {
   retry,
   wrappedFetchAPI,
 } from './api';
+import { NextjsStrapiGatewayError } from './errors';
 
 beforeEach(async () => {
   vi.stubGlobal('process', {
@@ -63,9 +64,25 @@ describe('fetchAPI', () => {
   });
 
   test('fails on invalid response format (not json)', async () => {
-    await expect(() => fetchAPI('/ping/bare')).rejects.toThrowError(
-      SyntaxError
+    await expect(() => fetchAPI('/ping/bare')).rejects.toThrow(
+      NextjsStrapiGatewayError
     );
+
+    try {
+      await fetchAPI('/ping/bare');
+    } catch (error) {
+      expect(error).toMatchObject({
+        details: { originalError: expect.any(Error) },
+      });
+
+      if (error) {
+        const typedError = error as NextjsStrapiGatewayError<{
+          originalError: Error;
+        }>;
+
+        expect(typedError?.details?.originalError).toBeInstanceOf(SyntaxError);
+      }
+    }
   });
 });
 

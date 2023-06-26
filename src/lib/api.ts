@@ -2,6 +2,7 @@ import qs from 'qs';
 
 import type { ObjectWithProp } from './types';
 import { wait } from './utils';
+import { NextjsStrapiGatewayError } from './errors';
 
 export type APICall<T> = (
   path: string,
@@ -34,6 +35,8 @@ export const getStrapiURL = (path = '') =>
  * @param urlParamsObject the query string parameters
  * @param options the options passed to the fetch call
  *                (authentication is handled automatically)
+ *
+ * @throws NextjsStrapiGatewayError
  *
  * @returns the API response as JSON
  */
@@ -71,7 +74,11 @@ export const fetchAPI = async <T>(
     ].join(' ');
 
     console.error(message);
-    throw new Error(message);
+    throw new NextjsStrapiGatewayError(message, {
+      status: response.status,
+      statusText: response.statusText,
+      path,
+    });
   }
 
   try {
@@ -82,7 +89,13 @@ export const fetchAPI = async <T>(
     const message = ['Strapi API JSON error:', error, '@', path].join(' ');
 
     console.error(message);
-    throw error;
+
+    throw new NextjsStrapiGatewayError(message, {
+      originalError: error,
+      status: response.status,
+      statusText: response.statusText,
+      path,
+    });
   }
 };
 
@@ -134,12 +147,24 @@ export const retry = async <T>(
     } catch (error) {
       lastError = error;
 
-      console.warn(
-        [
-          `(Retry ${round + 1}/${maxTries}) Strapi API query error:`,
-          (error as Error).message,
-        ].join(' ')
-      );
+      if (error instanceof NextjsStrapiGatewayError) {
+        const { path } = error.details;
+
+        console.warn(
+          [
+            `(${round + 1}/${maxTries}) Retry:`,
+            (error as Error).message,
+            '@',
+            path,
+          ].join(' ')
+        );
+      } else {
+        console.warn(
+          [`(${round + 1}/${maxTries}) Retry:`, (error as Error).message].join(
+            ' '
+          )
+        );
+      }
 
       if (round < maxTries - 1) {
         await wait(waitDelay);
