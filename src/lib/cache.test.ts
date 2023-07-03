@@ -19,8 +19,10 @@ describe('hasCache', () => {
   test('cache has key', () => {
     expect(hasCache('dummy')).toBeFalsy;
   });
+});
 
-  test('cache operations', () => {
+describe('cache operations', () => {
+  test('put, get, remove', () => {
     expect(hasCache('new')).toBeFalsy;
 
     putCache('new', 'ok');

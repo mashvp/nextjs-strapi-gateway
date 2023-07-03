@@ -1,17 +1,36 @@
 import sha256 from 'crypto-js/sha256';
-
 import { serializeUrlParamsObject } from './utils';
 
-const CacheMap = new Map<string, unknown>();
+export interface CacheMapElement {
+  timestamp: number;
+  value: unknown;
+}
 
-export const hasCache = (key: string) => CacheMap.has(key);
+const cacheMap = new Map<string, CacheMapElement>();
+
+export const hasCache = (key: string) => cacheMap.has(key);
+
+export const expireCache = (key: string, shelfLife: number = 60_000) => {
+  const rawCache = getCacheRaw(key);
+
+  if (rawCache) {
+    const then = rawCache.timestamp;
+    const now = Date.now();
+
+    if (now - then >= shelfLife) {
+      removeCache(key);
+    }
+  }
+};
 
 export const putCache = (key: string, value: unknown) =>
-  CacheMap.set(key, value);
+  cacheMap.set(key, { timestamp: Date.now(), value });
 
-export const getCache = (key: string) => CacheMap.get(key);
+export const getCacheRaw = (key: string) => cacheMap.get(key);
 
-export const removeCache = (key: string) => CacheMap.delete(key);
+export const getCache = (key: string) => cacheMap.get(key)?.value;
+
+export const removeCache = (key: string) => cacheMap.delete(key);
 
 /**
  * Computes the cache key for this request

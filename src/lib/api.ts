@@ -3,7 +3,13 @@ import qs from 'qs';
 import type { ObjectWithProp } from './types';
 import { wait } from './utils';
 import { NextjsStrapiGatewayError } from './errors';
-import { getCache, getCacheKey, hasCache, putCache } from './cache';
+import {
+  expireCache,
+  getCache,
+  getCacheKey,
+  hasCache,
+  putCache,
+} from './cache';
 
 export type APICall<T> = (
   path: string,
@@ -49,6 +55,8 @@ export const fetchAPI = async <T>(
   bustCache: boolean = false
 ) => {
   const cacheKey = await getCacheKey(path, urlParamsObject);
+
+  expireCache(cacheKey, bustCache ? 0 : 60_000);
 
   if (!bustCache && hasCache(cacheKey)) {
     return getCache(cacheKey) as T;
