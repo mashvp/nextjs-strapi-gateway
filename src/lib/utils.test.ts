@@ -1,10 +1,6 @@
 import { test, expect, describe } from 'vitest';
-import {
-  deepSortObject,
-  getCacheKey,
-  serializeUrlParamsObject,
-  wait,
-} from './utils';
+import { deepSortObject, serializeUrlParamsObject, wait } from './utils';
+import { getCacheKey } from './cache';
 
 describe('wait', () => {
   test('resolves', async () => {

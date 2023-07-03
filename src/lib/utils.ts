@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 /**
  * Returns a Promise that resolves after a given delay
  *
@@ -52,27 +50,4 @@ export const serializeUrlParamsObject = (
   const sortedObject = deepSortObject(urlParamsObject);
 
   return JSON.stringify(sortedObject);
-};
-
-/**
- * Computes the cache key for this request
- *
- * @param path the API path to query
- * @param urlParamsObject the API params object
- * @returns string
- */
-export const getCacheKey = async (
-  path: string,
-  urlParamsObject: Record<string, unknown> = {}
-) => {
-  const serializedParams = serializeUrlParamsObject(urlParamsObject);
-  const cacheKey = [path, serializedParams].join('__');
-
-  const encoder = new TextEncoder();
-  const encodedKey = encoder.encode(cacheKey);
-
-  const cacheDigest = await crypto.subtle.digest('SHA-256', encodedKey);
-  const digestArray = Array.from(new Uint8Array(cacheDigest));
-
-  return digestArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
 };

@@ -1,9 +1,9 @@
 import qs from 'qs';
 
 import type { ObjectWithProp } from './types';
-import { getCacheKey, wait } from './utils';
+import { wait } from './utils';
 import { NextjsStrapiGatewayError } from './errors';
-import { getCache, hasCache, putCache } from './cache';
+import { getCache, getCacheKey, hasCache, putCache } from './cache';
 
 export type APICall<T> = (
   path: string,
