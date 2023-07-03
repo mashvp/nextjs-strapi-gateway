@@ -28,7 +28,7 @@ describe('getStrapiURL', () => {
 
 describe('fetchAPI', () => {
   test('fetches a basic api endpoint', async () => {
-    expect(await fetchAPI('/homepage')).toMatchObject({
+    await expect(fetchAPI('/homepage')).resolves.toMatchObject({
       data: {
         id: expect.any(Number),
         attributes: expect.any(Object),
@@ -37,7 +37,9 @@ describe('fetchAPI', () => {
   });
 
   test('fetches an api endpoint with a querystring', async () => {
-    expect(await fetchAPI('/homepage', { populate: '*' })).toMatchObject({
+    await expect(
+      fetchAPI('/homepage', { populate: '*' })
+    ).resolves.toMatchObject({
       data: {
         id: expect.any(Number),
         attributes: {
@@ -48,9 +50,7 @@ describe('fetchAPI', () => {
   });
 
   test('fails with 404 error on unknown endpoint', async () => {
-    await expect(() => fetchAPI('/invalid')).rejects.toThrowError(
-      /404 not found/i
-    );
+    await expect(fetchAPI('/invalid')).rejects.toThrowError(/404 not found/i);
   });
 
   test('fails on invalid or missing access token', async () => {
@@ -58,13 +58,13 @@ describe('fetchAPI', () => {
       env: { STRAPI_API_TOKEN: '__INVALID__' },
     });
 
-    await expect(() => fetchAPI('/homepage')).rejects.toThrowError(
+    await expect(fetchAPI('/homepage', {}, {}, true)).rejects.toThrowError(
       /401 unauthorized/i
     );
   });
 
   test('fails on invalid response format (not json)', async () => {
-    await expect(() => fetchAPI('/ping/bare')).rejects.toThrow(
+    await expect(fetchAPI('/ping/bare')).rejects.toThrow(
       NextjsStrapiGatewayError
     );
 
@@ -88,19 +88,21 @@ describe('fetchAPI', () => {
 
 describe('fetchNoop', () => {
   test('returns an empty object', async () => {
-    expect(await fetchNoop()).toStrictEqual({});
+    await expect(fetchNoop()).resolves.toStrictEqual({});
   });
 
   test('returns the passed object', async () => {
     const value = { foo: 'bar' };
 
-    expect(await fetchNoop(value)).toStrictEqual(value);
+    await expect(fetchNoop(value)).resolves.toStrictEqual(value);
   });
 });
 
 describe('wrappedFetchAPI', () => {
   test('fetches a basic wrapped api endpoint', async () => {
-    expect(await wrappedFetchAPI('foobar', ['/homepage'])).toMatchObject({
+    await expect(
+      wrappedFetchAPI('foobar', ['/homepage'])
+    ).resolves.toMatchObject({
       foobar: {
         data: {
           id: expect.any(Number),
@@ -111,14 +113,50 @@ describe('wrappedFetchAPI', () => {
   });
 
   test('fails with 404 error on unknown endpoint', async () => {
-    await expect(() =>
-      wrappedFetchAPI('invalid', ['/invalid'])
-    ).rejects.toThrowError(/404 not found/i);
+    await expect(wrappedFetchAPI('invalid', ['/invalid'])).rejects.toThrowError(
+      /404 not found/i
+    );
   });
 });
 
 describe('retry', () => {
   test('tries three times then gives up', async () => {
-    await expect(retry(() => fetchAPI('/dummy'), 3, 100)).throws;
+    await expect(retry(() => fetchAPI('/dummy'), 3)).throws;
+  });
+
+  test('tries five times, succeeds at fourth, then stops', async () => {
+    let round = 0;
+
+    const mockFetch = async () => {
+      round += 1;
+
+      if (round >= 4) {
+        return { success: true };
+      }
+
+      throw new Error();
+    };
+
+    await expect(retry(mockFetch, 5)).resolves.toMatchObject({
+      success: true,
+    });
+  });
+
+  test('throws a builtin error with details', async () => {
+    const mockFetch = async () => {
+      throw new NextjsStrapiGatewayError('Retry dummy error', {
+        path: '/dummy',
+      });
+    };
+
+    await expect(() => retry(mockFetch, 5)).throws;
+  });
+
+  test('throws a builtin error without details', async () => {
+    const mockFetch = async () => {
+      throw new NextjsStrapiGatewayError('Retry dummy error');
+    };
+
+    await expect(() => retry(mockFetch, 5)).throws;
   });
 });

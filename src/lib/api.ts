@@ -1,8 +1,9 @@
 import qs from 'qs';
 
 import type { ObjectWithProp } from './types';
-import { wait } from './utils';
+import { getCacheKey, wait } from './utils';
 import { NextjsStrapiGatewayError } from './errors';
+import { getCache, hasCache, putCache } from './cache';
 
 export type APICall<T> = (
   path: string,
@@ -35,6 +36,7 @@ export const getStrapiURL = (path = '') =>
  * @param urlParamsObject the query string parameters
  * @param options the options passed to the fetch call
  *                (authentication is handled automatically)
+ * @param bustCache whether to ignore the cache or not
  *
  * @throws NextjsStrapiGatewayError
  *
@@ -43,8 +45,15 @@ export const getStrapiURL = (path = '') =>
 export const fetchAPI = async <T>(
   path: string,
   urlParamsObject: Record<string, unknown> = {},
-  options: RequestInit = {}
+  options: RequestInit = {},
+  bustCache: boolean = false
 ) => {
+  const cacheKey = await getCacheKey(path, urlParamsObject);
+
+  if (!bustCache && hasCache(cacheKey)) {
+    return getCache(cacheKey) as T;
+  }
+
   const mergedOptions = {
     ...options,
     headers: {
@@ -83,6 +92,10 @@ export const fetchAPI = async <T>(
 
   try {
     const json = await response.json();
+
+    if (!bustCache) {
+      putCache(cacheKey, json);
+    }
 
     return json as T;
   } catch (error) {
@@ -148,16 +161,27 @@ export const retry = async <T>(
       lastError = error;
 
       if (error instanceof NextjsStrapiGatewayError) {
-        const { path } = error.details;
+        const { details } = error;
 
-        console.warn(
-          [
-            `(${round + 1}/${maxTries}) Retry:`,
-            (error as Error).message,
-            '@',
-            path,
-          ].join(' ')
-        );
+        if (details) {
+          const { path } = details;
+
+          console.warn(
+            [
+              `(${round + 1}/${maxTries}) Retry:`,
+              (error as Error).message,
+              '@',
+              path,
+            ].join(' ')
+          );
+        } else {
+          console.warn(
+            [
+              `(${round + 1}/${maxTries}) Retry:`,
+              (error as Error).message,
+            ].join(' ')
+          );
+        }
       } else {
         console.warn(
           [`(${round + 1}/${maxTries}) Retry:`, (error as Error).message].join(
