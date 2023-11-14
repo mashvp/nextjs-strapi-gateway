@@ -54,6 +54,11 @@ export const fetchAPI = async <T>(
   options: RequestInit = {},
   bustCache: boolean = false
 ) => {
+  if (!process.env.STRAPI_API_TOKEN) {
+    console.warn('[warn] No Strapi API token provided');
+    console.debug(process.env);
+  }
+
   const cacheKey = await getCacheKey(path, urlParamsObject);
 
   expireCache(cacheKey, bustCache ? 0 : 60_000);
