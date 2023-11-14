@@ -97,12 +97,6 @@ export const fetchAPI = async <T>(
 
     console.error(message);
 
-    console.debug('==============================');
-    console.debug(mergedOptions);
-    console.debug('==============================');
-    console.debug(process.env);
-    console.debug('==============================');
-
     throw new NextjsStrapiGatewayError(message, {
       status: response.status,
       statusText: response.statusText,
