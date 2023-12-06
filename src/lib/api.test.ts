@@ -31,7 +31,6 @@ describe('fetchAPI', () => {
     await expect(fetchAPI('/homepage')).resolves.toMatchObject({
       data: {
         id: expect.any(Number),
-        attributes: expect.any(Object),
       },
     });
   });
@@ -42,9 +41,7 @@ describe('fetchAPI', () => {
     ).resolves.toMatchObject({
       data: {
         id: expect.any(Number),
-        attributes: {
-          seo: expect.any(Object),
-        },
+        seo: expect.any(Object),
       },
     });
   });
@@ -106,7 +103,6 @@ describe('wrappedFetchAPI', () => {
       foobar: {
         data: {
           id: expect.any(Number),
-          attributes: expect.any(Object),
         },
       },
     });

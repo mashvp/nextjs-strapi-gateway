@@ -24,13 +24,11 @@ describe('createGlobalDataWrapper', () => {
     expect(await withGlobalData(() => fetchAPI('/homepage'))).toMatchObject({
       data: {
         id: expect.any(Number),
-        attributes: expect.any(Object),
       },
       global: {
         navigation: {
           data: {
             id: expect.any(Number),
-            attributes: expect.any(Object),
           },
         },
       },

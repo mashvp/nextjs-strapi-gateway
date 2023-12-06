@@ -26,6 +26,7 @@
     "build": "tsc && vite build",
     "test": "vitest",
     "coverage": "vitest run --coverage",
+    "coverage:serve": "serve -p 8080 coverage/",
     "prepare": "npm run build"
   },
   "devDependencies": {
