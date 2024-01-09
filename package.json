@@ -1,7 +1,7 @@
 {
   "name": "@mashvp/nextjs-strapi-gateway",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Next.js helpers for fetching data from the Strapi REST API",
   "repository": "https://github.com/mashvp/nextjs-strapi-gateway",
   "author": "Mashvp",
