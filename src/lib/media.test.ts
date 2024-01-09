@@ -23,18 +23,27 @@ beforeEach(async () => {
 
 describe('getStrapiMediaURL', () => {
   test('returns the api-prefixed url from media data', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
     const fakeMedia: ImageMedia = {
       data: {
         id: 123,
         attributes: {
-          name: 'Fake',
-          hash: 'fake123',
-          url: '/fake.png',
-          ext: 'png',
-          mime: 'image/png',
-          width: 800,
-          height: 600,
-          formats: {},
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: fakeBase,
+            large: fakeBase,
+          },
         },
       },
     };
@@ -43,23 +52,94 @@ describe('getStrapiMediaURL', () => {
   });
 
   test('returns the bare url from media data', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: 'http://example.com/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
     const fakeMedia: ImageMedia = {
       data: {
         id: 123,
         attributes: {
-          name: 'Fake',
-          hash: 'fake123',
-          url: 'http://example.com/fake.png',
-          ext: 'png',
-          mime: 'image/png',
-          width: 800,
-          height: 600,
-          formats: {},
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: fakeBase,
+            large: fakeBase,
+          },
         },
       },
     };
 
     expect(getStrapiMediaURL(fakeMedia)).toBe('http://example.com/fake.png');
+  });
+
+  test('returns the api-prefixed url from media data of requested format', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
+    const fakeMedia: ImageMedia = {
+      data: {
+        id: 123,
+        attributes: {
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: { ...fakeBase, url: '/good.png' },
+            large: fakeBase,
+          },
+        },
+      },
+    };
+
+    expect(getStrapiMediaURL(fakeMedia, 'medium')).toBe(
+      'http://localhost:1337/good.png'
+    );
+  });
+
+  test('returns the bare url from media data of requested format', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: 'http://example.com/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
+    const fakeMedia: ImageMedia = {
+      data: {
+        id: 123,
+        attributes: {
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: { ...fakeBase, url: 'http://example.com/good.png' },
+            large: fakeBase,
+          },
+        },
+      },
+    };
+
+    expect(getStrapiMediaURL(fakeMedia, 'medium')).toBe(
+      'http://example.com/good.png'
+    );
   });
 
   test('returns the api-prefixed url from media format', () => {
@@ -90,9 +170,8 @@ describe('getStrapiMediaURL', () => {
     expect(getStrapiMediaURL(fakeMedia)).toBe('http://example.com/fake.png');
   });
 
-  test('returns the care url from untransformed media format', () => {
-    const fakeMedia: UntransformedImageMedia = {
-      id: 123,
+  test('returns the bare url from untransformed media format', () => {
+    const fakeBase: ImageDataFormat = {
       name: 'Fake',
       hash: 'fake123',
       url: 'http://example.com/fake.png',
@@ -100,25 +179,44 @@ describe('getStrapiMediaURL', () => {
       mime: 'image/png',
       width: 800,
       height: 600,
-      formats: {},
+    };
+
+    const fakeMedia: UntransformedImageMedia = {
+      id: 123,
+      ...fakeBase,
+      formats: {
+        thumbnail: fakeBase,
+        small: fakeBase,
+        medium: fakeBase,
+        large: fakeBase,
+      },
     };
 
     expect(getStrapiMediaURL(fakeMedia)).toBe('http://example.com/fake.png');
   });
 
   test('predicate for image media: valid', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
     const fakeMedia: ImageMedia = {
       data: {
         id: 123,
         attributes: {
-          name: 'Fake',
-          hash: 'fake123',
-          url: '/fake.png',
-          ext: 'png',
-          mime: 'image/png',
-          width: 800,
-          height: 600,
-          formats: {},
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: fakeBase,
+            large: fakeBase,
+          },
         },
       },
     };
@@ -155,18 +253,27 @@ describe('getStrapiMediaURL', () => {
   });
 
   test('predicate for image data format: invalid', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
     const fakeMedia: ImageMedia = {
       data: {
         id: 123,
         attributes: {
-          name: 'Fake',
-          hash: 'fake123',
-          url: '/fake.png',
-          ext: 'png',
-          mime: 'image/png',
-          width: 800,
-          height: 600,
-          formats: {},
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: fakeBase,
+            large: fakeBase,
+          },
         },
       },
     };
@@ -175,8 +282,7 @@ describe('getStrapiMediaURL', () => {
   });
 
   test('predicate for untransformed image media: valid', () => {
-    const fakeMedia: UntransformedImageMedia = {
-      id: 123,
+    const fakeBase: ImageDataFormat = {
       name: 'Fake',
       hash: 'fake123',
       url: 'http://example.com/fake.png',
@@ -184,25 +290,44 @@ describe('getStrapiMediaURL', () => {
       mime: 'image/png',
       width: 800,
       height: 600,
-      formats: {},
+    };
+
+    const fakeMedia: UntransformedImageMedia = {
+      id: 123,
+      ...fakeBase,
+      formats: {
+        thumbnail: fakeBase,
+        small: fakeBase,
+        medium: fakeBase,
+        large: fakeBase,
+      },
     };
 
     expect(isUntransformedImageMedia(fakeMedia)).toBeTruthy();
   });
 
   test('predicate for untransformed image media: invalid', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
     const fakeMedia: ImageMedia = {
       data: {
         id: 123,
         attributes: {
-          name: 'Fake',
-          hash: 'fake123',
-          url: '/fake.png',
-          ext: 'png',
-          mime: 'image/png',
-          width: 800,
-          height: 600,
-          formats: {},
+          ...fakeBase,
+          formats: {
+            thumbnail: fakeBase,
+            small: fakeBase,
+            medium: fakeBase,
+            large: fakeBase,
+          },
         },
       },
     };

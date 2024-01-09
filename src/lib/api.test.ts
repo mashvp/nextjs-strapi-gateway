@@ -50,7 +50,15 @@ describe('fetchAPI', () => {
     await expect(fetchAPI('/invalid')).rejects.toThrowError(/404 not found/i);
   });
 
-  test('fails on invalid or missing access token', async () => {
+  test('fails on missing access token', async () => {
+    vi.unstubAllGlobals();
+
+    await expect(fetchAPI('/homepage', {}, {}, true)).rejects.toThrowError(
+      /401 unauthorized/i
+    );
+  });
+
+  test('fails on invalid access token', async () => {
     vi.stubGlobal('process', {
       env: { STRAPI_API_TOKEN: '__INVALID__' },
     });

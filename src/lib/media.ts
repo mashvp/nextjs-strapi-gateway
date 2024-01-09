@@ -10,10 +10,14 @@ export interface ImageDataFormat {
   height: number;
 }
 
+export type ImageFormat = 'thumbnail' | 'small' | 'medium' | 'large';
+
 export interface ImageData extends ImageDataFormat {
   alternativeText?: string;
-  formats: { [key: string]: ImageDataFormat };
   blurhash?: string;
+  formats: {
+    [key in ImageFormat]: ImageDataFormat;
+  };
 }
 
 export type ImageDataWithoutFormat = Omit<ImageData, 'formats'>;
@@ -46,10 +50,18 @@ export const isImageDataFormat = (
 ): media is ImageDataFormat =>
   !isImageMedia(media) && !isUntransformedImageMedia(media);
 
-export const getStrapiMediaURL = (mediaOrFormat: GenericImageMedia) => {
-  const { url } = isImageMedia(mediaOrFormat)
-    ? mediaOrFormat.data.attributes
-    : mediaOrFormat;
+export const getStrapiMediaURL = (
+  mediaOrFormat: GenericImageMedia,
+  format?: ImageFormat
+) => {
+  const effectiveMedia =
+    format && isImageMedia(mediaOrFormat)
+      ? mediaOrFormat.data.attributes.formats[format]
+      : mediaOrFormat;
+
+  const { url } = isImageMedia(effectiveMedia)
+    ? effectiveMedia.data.attributes
+    : effectiveMedia;
 
   return url.startsWith('/') ? getStrapiURL(url) : url;
 };
