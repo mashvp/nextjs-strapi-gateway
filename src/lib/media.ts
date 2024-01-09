@@ -54,10 +54,15 @@ export const getStrapiMediaURL = (
   mediaOrFormat: GenericImageMedia,
   format?: ImageFormat
 ) => {
-  const effectiveMedia =
-    format && isImageMedia(mediaOrFormat)
-      ? mediaOrFormat.data.attributes.formats[format]
-      : mediaOrFormat;
+  let effectiveMedia = mediaOrFormat;
+
+  if (format) {
+    if (isImageMedia(effectiveMedia)) {
+      effectiveMedia = effectiveMedia.data.attributes.formats[format];
+    } else if (isUntransformedImageMedia(effectiveMedia)) {
+      effectiveMedia = effectiveMedia.formats[format];
+    }
+  }
 
   const { url } = isImageMedia(effectiveMedia)
     ? effectiveMedia.data.attributes

@@ -170,7 +170,32 @@ describe('getStrapiMediaURL', () => {
     expect(getStrapiMediaURL(fakeMedia)).toBe('http://example.com/fake.png');
   });
 
-  test('returns the bare url from untransformed media format', () => {
+  test('returns the api-prefixed url from untransformed media data', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
+    const fakeMedia: UntransformedImageMedia = {
+      id: 123,
+      ...fakeBase,
+      formats: {
+        thumbnail: fakeBase,
+        small: fakeBase,
+        medium: fakeBase,
+        large: fakeBase,
+      },
+    };
+
+    expect(getStrapiMediaURL(fakeMedia)).toBe('http://localhost:1337/fake.png');
+  });
+
+  test('returns the bare url from untransformed media data', () => {
     const fakeBase: ImageDataFormat = {
       name: 'Fake',
       hash: 'fake123',
@@ -193,6 +218,60 @@ describe('getStrapiMediaURL', () => {
     };
 
     expect(getStrapiMediaURL(fakeMedia)).toBe('http://example.com/fake.png');
+  });
+
+  test('returns the api-prefixed url from untransformed media data of requested format', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: '/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
+    const fakeMedia: UntransformedImageMedia = {
+      id: 123,
+      ...fakeBase,
+      formats: {
+        thumbnail: fakeBase,
+        small: fakeBase,
+        medium: { ...fakeBase, url: '/good.png' },
+        large: fakeBase,
+      },
+    };
+
+    expect(getStrapiMediaURL(fakeMedia, 'medium')).toBe(
+      'http://localhost:1337/good.png'
+    );
+  });
+
+  test('returns the bare url from untransformed media data of requested format', () => {
+    const fakeBase: ImageDataFormat = {
+      name: 'Fake',
+      hash: 'fake123',
+      url: 'http://example.com/fake.png',
+      ext: 'png',
+      mime: 'image/png',
+      width: 800,
+      height: 600,
+    };
+
+    const fakeMedia: UntransformedImageMedia = {
+      id: 123,
+      ...fakeBase,
+      formats: {
+        thumbnail: fakeBase,
+        small: fakeBase,
+        medium: { ...fakeBase, url: 'http://example.com/good.png' },
+        large: fakeBase,
+      },
+    };
+
+    expect(getStrapiMediaURL(fakeMedia, 'medium')).toBe(
+      'http://example.com/good.png'
+    );
   });
 
   test('predicate for image media: valid', () => {
