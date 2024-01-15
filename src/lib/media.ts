@@ -39,16 +39,20 @@ export type GenericImageMedia =
   | UntransformedImageMedia;
 
 export const isImageMedia = (media: GenericImageMedia): media is ImageMedia =>
-  'data' in media;
+  media && typeof media === 'object' && 'data' in media;
 
 export const isUntransformedImageMedia = (
   media: GenericImageMedia
-): media is UntransformedImageMedia => 'formats' in media;
+): media is UntransformedImageMedia =>
+  media && typeof media === 'object' && 'formats' in media;
 
 export const isImageDataFormat = (
   media: GenericImageMedia
 ): media is ImageDataFormat =>
-  !isImageMedia(media) && !isUntransformedImageMedia(media);
+  media &&
+  typeof media === 'object' &&
+  !isImageMedia(media) &&
+  !isUntransformedImageMedia(media);
 
 export const getStrapiMediaURL = (
   mediaOrFormat: GenericImageMedia,

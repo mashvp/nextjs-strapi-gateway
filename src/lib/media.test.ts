@@ -317,6 +317,14 @@ describe('getStrapiMediaURL', () => {
     expect(isImageMedia(fakeMedia)).toBeFalsy();
   });
 
+  test('predicate for image media: null', () => {
+    expect(isImageMedia(null!)).toBeFalsy();
+  });
+
+  test('predicate for image media: not an object', () => {
+    expect(isImageMedia('bad value' as any)).toBeFalsy();
+  });
+
   test('predicate for image data format: valid', () => {
     const fakeMedia: ImageDataFormat = {
       name: 'Fake',
@@ -358,6 +366,14 @@ describe('getStrapiMediaURL', () => {
     };
 
     expect(isImageDataFormat(fakeMedia)).toBeFalsy();
+  });
+
+  test('predicate for image data format: null', () => {
+    expect(isImageDataFormat(null!)).toBeFalsy();
+  });
+
+  test('predicate for image data format: not an object', () => {
+    expect(isImageDataFormat('bad value' as any)).toBeFalsy();
   });
 
   test('predicate for untransformed image media: valid', () => {
@@ -412,5 +428,13 @@ describe('getStrapiMediaURL', () => {
     };
 
     expect(isUntransformedImageMedia(fakeMedia)).toBeFalsy();
+  });
+
+  test('predicate for untransformed image media: null', () => {
+    expect(isUntransformedImageMedia(null!)).toBeFalsy();
+  });
+
+  test('predicate for untransformed image media: not an object', () => {
+    expect(isUntransformedImageMedia('bad value' as any)).toBeFalsy();
   });
 });
