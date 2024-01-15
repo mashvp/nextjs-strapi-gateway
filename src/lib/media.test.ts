@@ -7,6 +7,7 @@ import {
   isImageMedia,
   isImageDataFormat,
   isUntransformedImageMedia,
+  isObject,
 } from './media';
 
 beforeEach(async () => {
@@ -274,6 +275,50 @@ describe('getStrapiMediaURL', () => {
     );
   });
 
+  test('returns null for a null media', () => {
+    expect(getStrapiMediaURL(null!)).toBeNull();
+  });
+
+  test('returns null for not an object value', () => {
+    expect(getStrapiMediaURL('not a media' as any)).toBeNull();
+  });
+
+  test('returns null for an invalid media object', () => {
+    expect(getStrapiMediaURL({ invalid: true } as any)).toBeNull();
+  });
+});
+
+describe('isObject', () => {
+  test('predicate for object: valid', () => {
+    expect(isObject({})).toBeTruthy();
+  });
+
+  test('predicate for object: null', () => {
+    expect(isObject(null)).toBeFalsy();
+  });
+
+  test('predicate for object: undefined', () => {
+    expect(isObject(undefined)).toBeFalsy();
+  });
+
+  test('predicate for object: NaN', () => {
+    expect(isObject(NaN)).toBeFalsy();
+  });
+
+  test('predicate for object: number', () => {
+    expect(isObject(42)).toBeFalsy();
+  });
+
+  test('predicate for object: string', () => {
+    expect(isObject('Lorem ipsum')).toBeFalsy();
+  });
+
+  test('predicate for object: array', () => {
+    expect(isObject(['one', 'two', 'three'])).toBeFalsy();
+  });
+});
+
+describe('isImageMedia', () => {
   test('predicate for image media: valid', () => {
     const fakeBase: ImageDataFormat = {
       name: 'Fake',
@@ -324,7 +369,9 @@ describe('getStrapiMediaURL', () => {
   test('predicate for image media: not an object', () => {
     expect(isImageMedia('bad value' as any)).toBeFalsy();
   });
+});
 
+describe('isImageDataFormat', () => {
   test('predicate for image data format: valid', () => {
     const fakeMedia: ImageDataFormat = {
       name: 'Fake',
@@ -375,7 +422,9 @@ describe('getStrapiMediaURL', () => {
   test('predicate for image data format: not an object', () => {
     expect(isImageDataFormat('bad value' as any)).toBeFalsy();
   });
+});
 
+describe('isImageDataFormat', () => {
   test('predicate for untransformed image media: valid', () => {
     const fakeBase: ImageDataFormat = {
       name: 'Fake',

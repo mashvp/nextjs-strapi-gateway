@@ -10,7 +10,14 @@ export interface ImageDataFormat {
   height: number;
 }
 
-export type ImageFormat = 'thumbnail' | 'small' | 'medium' | 'large';
+export const imageFormatKeys = [
+  'thumbnail',
+  'small',
+  'medium',
+  'large',
+] as const;
+
+export type ImageFormat = (typeof imageFormatKeys)[number];
 
 export interface ImageData extends ImageDataFormat {
   alternativeText?: string;
@@ -38,27 +45,48 @@ export type GenericImageMedia =
   | ImageDataFormat
   | UntransformedImageMedia;
 
+export const isObject = (value: any): value is Object =>
+  value && typeof value === 'object' && !Array.isArray(value);
+
 export const isImageMedia = (media: GenericImageMedia): media is ImageMedia =>
-  media && typeof media === 'object' && 'data' in media;
+  isObject(media) &&
+  'data' in media &&
+  isObject(media.data) &&
+  'attributes' in media.data &&
+  isObject(media.data.attributes) &&
+  'formats' in media.data.attributes &&
+  isObject(media.data.attributes.formats) &&
+  imageFormatKeys.every((type) => type in media.data.attributes.formats);
 
 export const isUntransformedImageMedia = (
   media: GenericImageMedia
 ): media is UntransformedImageMedia =>
-  media && typeof media === 'object' && 'formats' in media;
+  isObject(media) &&
+  'formats' in media &&
+  isObject(media.formats) &&
+  imageFormatKeys.every((type) => type in media.formats);
 
 export const isImageDataFormat = (
   media: GenericImageMedia
 ): media is ImageDataFormat =>
-  media &&
-  typeof media === 'object' &&
+  isObject(media) &&
   !isImageMedia(media) &&
-  !isUntransformedImageMedia(media);
+  !isUntransformedImageMedia(media) &&
+  'url' in media;
 
 export const getStrapiMediaURL = (
   mediaOrFormat: GenericImageMedia,
   format?: ImageFormat
 ) => {
   let effectiveMedia = mediaOrFormat;
+
+  if (
+    !isImageMedia(effectiveMedia) &&
+    !isUntransformedImageMedia(effectiveMedia) &&
+    !isImageDataFormat(effectiveMedia)
+  ) {
+    return null;
+  }
 
   if (format) {
     if (isImageMedia(effectiveMedia)) {
@@ -67,6 +95,8 @@ export const getStrapiMediaURL = (
       effectiveMedia = effectiveMedia.formats[format];
     }
   }
+
+  console.log('effectiveMedia', effectiveMedia);
 
   const { url } = isImageMedia(effectiveMedia)
     ? effectiveMedia.data.attributes

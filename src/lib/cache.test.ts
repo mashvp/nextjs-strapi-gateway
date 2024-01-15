@@ -13,25 +13,25 @@ beforeEach(async () => {
 
 describe('hasCache', () => {
   test('cache has missing key', () => {
-    expect(hasCache('foobar')).toBeFalsy;
+    expect(hasCache('foobar')).toBeFalsy();
   });
 
   test('cache has key', () => {
-    expect(hasCache('dummy')).toBeFalsy;
+    expect(hasCache('dummy')).toBeTruthy();
   });
 });
 
 describe('cache operations', () => {
   test('put, get, remove', () => {
-    expect(hasCache('new')).toBeFalsy;
+    expect(hasCache('new')).toBeFalsy();
 
     putCache('new', 'ok');
 
-    expect(hasCache('new')).toBeTruthy;
+    expect(hasCache('new')).toBeTruthy();
     expect(getCache('new')).toBe('ok');
 
     removeCache('new');
 
-    expect(hasCache('new')).toBeFalsy;
+    expect(hasCache('new')).toBeFalsy();
   });
 });
