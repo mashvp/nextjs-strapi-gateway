@@ -96,8 +96,6 @@ export const getStrapiMediaURL = (
     }
   }
 
-  console.log('effectiveMedia', effectiveMedia);
-
   const { url } = isImageMedia(effectiveMedia)
     ? effectiveMedia.data.attributes
     : effectiveMedia;
