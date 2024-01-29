@@ -21,6 +21,7 @@ export type ImageFormat = (typeof imageFormatKeys)[number];
 
 export interface ImageData extends ImageDataFormat {
   alternativeText?: string;
+  caption?: string;
   blurhash?: string;
   formats: {
     [key in ImageFormat]: ImageDataFormat;
